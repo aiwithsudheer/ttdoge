@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElderGlitch ($TTDOGE) - The Coin Older Than Time</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #050505;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .font-mono {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* --- Custom Glitch Effect --- */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch {
+            position: relative;
+            color: #fff;
+            mix-blend-mode: lighten;
+        }
+
+        .glitch:before, .glitch:after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background: #050505;
+            clip: rect(0, 0, 0, 0);
+        }
+
+        .glitch:before {
+            left: -2px;
+            text-shadow: 2px 0 #ff00c1;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch:after {
+            left: 2px;
+            text-shadow: -2px 0 #00fff9;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(20px, 9999px, 15px, 0); }
+            20% { clip: rect(60px, 9999px, 70px, 0); }
+            40% { clip: rect(20px, 9999px, 50px, 0); }
+            60% { clip: rect(10px, 9999px, 30px, 0); }
+            80% { clip: rect(80px, 9999px, 90px, 0); }
+            100% { clip: rect(30px, 9999px, 40px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(15px, 9999px, 40px, 0); }
+            20% { clip: rect(80px, 9999px, 100px, 0); }
+            40% { clip: rect(10px, 9999px, 20px, 0); }
+            60% { clip: rect(50px, 9999px, 70px, 0); }
+            80% { clip: rect(30px, 9999px, 60px, 0); }
+            100% { clip: rect(90px, 9999px, 95px, 0); }
+        }
+
+        /* --- Starfield Background --- */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: var(--opacity);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--opacity); transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(0.5); }
+        }
+
+        /* --- Floating Animation --- */
+        .float {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translate(0,  0px); }
+            50% { transform: translate(0, 15px); }
+            100% { transform: translate(0, -0px); }
+        }
+
+        .crt-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            animation: scanline 5s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        @keyframes scanline {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border: 1px solid #ff00c1;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#ff00c1] selection:text-white">
+
+    <!-- Background Stars (JS will populate) -->
+    <div class="stars" id="starfield"></div>
+    <div class="crt-line"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-[#00fff9] to-[#ff00c1]">
+                ElderGlitch
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-mono text-gray-400">
+                <a href="#about" class="hover:text-[#00fff9] transition-colors">/About</a>
+                <a href="#features" class="hover:text-[#00fff9] transition-colors">/Features</a>
+                <a href="#tokenomics" class="hover:text-[#00fff9] transition-colors">/Tokenomics</a>
+            </div>
+            <button onclick="copyContract()" class="bg-[#ff00c1] hover:bg-[#d600a2] text-white px-4 py-2 rounded-none font-mono text-xs md:text-sm transition-all shadow-[4px_4px_0px_0px_rgba(0,255,249,1)] active:translate-x-1 active:translate-y-1 active:shadow-none">
+                BUY $TTDOGE
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden">
+        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            
+            <div class="z-10 order-2 md:order-1">
+                <div class="inline-block px-3 py-1 mb-4 border border-[#00fff9] text-[#00fff9] font-mono text-xs uppercase tracking-widest">
+                    System Error: Timeline Corrupted
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6">
+                    <span class="glitch" data-text="$TTDOGE">$TTDOGE</span><br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff00c1] to-purple-600">OLDER THAN TIME</span>
+                </h1>
+                <p class="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed">
+                    JWST found galaxies that shouldn't exist. We found the coin that paid for them. 
+                    <span class="text-white font-mono bg-red-900/30 px-1">Error 404: Physics Not Found.</span>
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="bg-transparent border-2 border-[#00fff9] text-[#00fff9] hover:bg-[#00fff9] hover:text-black px-8 py-3 font-mono font-bold transition-all uppercase tracking-wider group">
+                        View Chart <i class="fas fa-chart-line ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    <button class="bg-white/5 hover:bg-white/10 text-white px-8 py-3 font-mono transition-all flex items-center justify-center gap-2 border border-gray-700">
+                        <i class="fab fa-telegram"></i> Join the Glitch
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative order-1 md:order-2 flex justify-center">
+                <!-- Mascot Area: Placeholder for user's image -->
+                <div class="relative w-64 h-64 md:w-96 md:h-96 float">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#00fff9] to-[#ff00c1] rounded-full blur-[60px] opacity-30"></div>
+                    <!-- SVG Placeholder for Time Traveler Doge -->
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-2xl relative z-10">
+                        <defs>
+                            <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#001f3f;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0074D9;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Space Helmet -->
+                        <circle cx="100" cy="100" r="90" fill="#f0f0f0" stroke="#ccc" stroke-width="4"/>
+                        <!-- Visor -->
+                        <path d="M40,100 A60,60 0 0,1 160,100 A60,50 0 0,1 40,100" fill="url(#visorGrad)" stroke="#333" stroke-width="2"/>
+                        <!-- Reflection -->
+                        <ellipse cx="70" cy="70" rx="15" ry="8" fill="white" opacity="0.4" transform="rotate(-45 70 70)"/>
+                        <!-- Doge Ears sticking out slightly -->
+                        <path d="M50,40 L30,10 L70,30 Z" fill="#D4af37" /> 
+                        <path d="M150,40 L170,10 L130,30 Z" fill="#D4af37" />
+                        <!-- Doge Face (Simplified) inside visor -->
+                        <circle cx="85" cy="95" r="5" fill="black"/>
+                        <circle cx="115" cy="95" r="5" fill="black"/>
+                        <path d="M95,110 Q100,115 105,110" fill="none" stroke="black" stroke-width="2"/>
+                        <!-- Text label on image since we can't upload the real jpg -->
+                        <text x="100" y="180" text-anchor="middle" fill="#333" font-family="monospace" font-size="12" font-weight="bold">TIME TRAVELER DOGE</text>
+                    </svg>
+                    
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-10 -right-10 text-[#00fff9] text-4xl animate-pulse">
+                        <i class="fas fa-atom fa-spin" style="animation-duration: 10s;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="bg-[#ff00c1] text-black py-2 overflow-hidden border-y-4 border-black">
+        <div class="whitespace-nowrap font-mono font-bold text-lg animate-marquee inline-block">
+            UNIVERSE V1.0 CRASHED /// LOADING BACKUP... /// $TTDOGE FOUND /// PHYSICS DEPRECATED /// BUY THE DIP BEFORE THE BIG BANG /// 
+            UNIVERSE V1.0 CRASHED /// LOADING BACKUP... /// $TTDOGE FOUND /// PHYSICS DEPRECATED /// BUY THE DIP BEFORE THE BIG BANG ///
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-[#0a0a0a] relative">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">THE <span class="text-[#00fff9]">JWST</span> ANOMALY</h2>
+                <div class="h-1 w-20 bg-[#ff00c1] mx-auto mb-6"></div>
+                <p class="text-gray-400 leading-relaxed text-lg">
+                    The James Webb Space Telescope just found galaxies that look like they’re 13 billion years old in a universe that was only supposed to be 1 billion years old at the time. Essentially, the universe has a "glitch"—we found the "Boomers" of the cosmos who were somehow born before the Big Bang itself.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-[#111] p-8 border border-gray-800 hover:border-[#ff00c1] transition-all group">
+                    <div class="text-4xl text-[#ff00c1] mb-4 group-hover:scale-110 transition-transform inline-block">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 font-mono">Impossible Market Cap</h3>
+                    <p class="text-sm text-gray-500">
+                        Aiming for a market cap bigger than standard physics allows. We don't follow the laws of thermodynamics, we just go up.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-[#111] p-8 border border-gray-800 hover:border-[#00fff9] transition-all group">
+                    <div class="text-4xl text-[#00fff9] mb-4 group-hover:scale-110 transition-transform inline-block">
+                        <i class="fas fa-glasses"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 font-mono">Red Shift Rewards</h3>
+                    <p class="text-sm text-gray-500">
+                        Focusing on the "Red Monster" galaxies that broke the timeline. The older the hold, the bigger the rewards.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-[#111] p-8 border border-gray-800 hover:border-[#ff00c1] transition-all group">
+                    <div class="text-4xl text-[#ff00c1] mb-4 group-hover:scale-110 transition-transform inline-block">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 font-mono">404 Physics Not Found</h3>
+                    <p class="text-sm text-gray-500">
+                        The official currency of the simulation glitch. While scientists patch "Universe V1.0", we are going to the moon.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tokenomics / Terminal -->
+    <section id="tokenomics" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="bg-[#0f0f0f] rounded-lg border border-gray-700 shadow-2xl overflow-hidden max-w-4xl mx-auto font-mono">
+                <!-- Terminal Header -->
+                <div class="bg-[#1a1a1a] px-4 py-2 border-b border-gray-700 flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <div class="ml-4 text-xs text-gray-500">user@universe:~/elderglitch/config</div>
+                </div>
+                <!-- Terminal Body -->
+                <div class="p-6 md:p-10 text-sm md:text-base">
+                    <div class="mb-4">
+                        <span class="text-[#00fff9]">➜</span> <span class="text-[#ff00c1]">run</span> token_stats.exe
+                    </div>
+                    <div class="space-y-2 text-gray-300">
+                        <p>> Initializing connection to older timeline...</p>
+                        <p>> Success. Data retrieved from T-minus 14 Billion Years.</p>
+                        <br>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-l-2 border-gray-700 pl-4">
+                            <div>
+                                <p class="text-gray-500 text-xs uppercase">Token Name</p>
+                                <p class="text-xl font-bold">ElderGlitch</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs uppercase">Ticker</p>
+                                <p class="text-xl font-bold text-[#ff00c1]">$TTDOGE</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs uppercase">Total Supply</p>
+                                <p class="text-xl font-bold">13,800,000,000</p>
+                                <p class="text-xs text-gray-500">(One for every year of the universe)</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 text-xs uppercase">Contract Address</p>
+                                <p class="text-xs md:text-sm text-[#00fff9] cursor-pointer hover:underline break-all" onclick="document.execCommand('copy')">
+                                    0x000000000GLITCH000000000
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 animate-pulse">
+                        <span class="text-[#00fff9]">➜</span> <span class="inline-block w-2 h-4 bg-[#00fff9] align-middle"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-10 border-t border-gray-800 text-center relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="text-2xl font-bold mb-6 tracking-widest text-[#00fff9]">$TTDOGE</h2>
+            <div class="flex justify-center gap-6 mb-8">
+                <a href="#" class="text-gray-500 hover:text-white text-2xl transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-500 hover:text-white text-2xl transition-colors"><i class="fab fa-telegram"></i></a>
+                <a href="#" class="text-gray-500 hover:text-white text-2xl transition-colors"><i class="fab fa-discord"></i></a>
+            </div>
+            <p class="text-gray-600 text-xs font-mono">
+                DISCLAIMER: This is a meme coin. It has no intrinsic value or expectation of financial return. 
+                We are literally betting on glitches in the fabric of reality.
+            </p>
+            <p class="text-gray-700 text-xs mt-4">
+                © Pre-Big Bang Era. All Wrong Reserved.
+            </p>
+        </div>
+        
+        <!-- Glitch Effect Footer Background -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none bg-[url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif')] bg-cover"></div>
+    </footer>
+
+    <script>
+        // Star Generation
+        document.addEventListener('DOMContentLoaded', () => {
+            const starfield = document.getElementById('starfield');
+            const starCount = 150;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random positioning
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 3;
+                const duration = Math.random() * 3 + 2; // 2-5s blink
+                const opacity = Math.random();
+
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--opacity', opacity);
+
+                starfield.appendChild(star);
+            }
+        });
+
+        // Copy Contract
+        function copyContract() {
+            // In a real scenario, use navigator.clipboard.writeText
+            // For iframe safety/compatibility in preview:
+            const tempInput = document.createElement("input");
+            tempInput.value = "0x000000000GLITCH000000000";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            const btn = document.querySelector('nav button');
+            const originalText = btn.innerText;
+            btn.innerText = "COPIED!";
+            btn.classList.add('bg-green-500', 'border-green-500', 'text-black');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-500', 'border-green-500', 'text-black');
+            }, 2000);
+        }
+    </script>
+    <style>
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+</body>
+</html>
